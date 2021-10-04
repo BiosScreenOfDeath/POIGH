@@ -28,10 +28,19 @@ func saveToLog(filename string, entry *ProjectLog) {
 	jsonData := []ProjectLog{}
 	filteredJsonData := []ProjectLog{}
 	dateAlreadyExists := false
-	fileRead, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
+
+	fileRead, fileReadError := ioutil.ReadFile(filename)
+	if fileReadError != nil {
+
+		if _, directoryError := os.Stat("log"); os.IsNotExist(directoryError) {
+			os.Mkdir("log", os.ModePerm)
+		}
+		_, createError := os.Create(filename)
+		if createError != nil {
+			panic(createError)
+		}
 	}
+
 	json.Unmarshal(fileRead, &jsonData)
 
 	for _, object := range jsonData {
